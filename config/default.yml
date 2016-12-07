@@ -1,0 +1,7 @@
+---
+Infl/SoftLineLength:
+  Description: Gentler line length checker
+  Enabled: true
+  SoftLimit: 80
+  HardLimit: 120
+  SoftAllowancePercentOfLines: 5
