@@ -3,8 +3,8 @@ module RuboCop
     module Infl
       # Checks forgivingly for line lengths
       class SoftLineLength < Cop
-        HARD_MSG = "Line exceeds hard length limit. [%d/%d]"
-        SOFT_MSG = "Line exceeds soft length limit. [%d/%d]"
+        HARD_MSG = 'Line exceeds hard length limit. [%d/%d]'.freeze
+        SOFT_MSG = 'Line exceeds soft length limit. [%d/%d]'.freeze
 
         include RuboCop::Cop::ConfigurableEnforcedStyle
 
@@ -14,16 +14,7 @@ module RuboCop
             (stats.size * soft_allowance_percent_of_lines / 100.0).round
 
           stats.each do |check, index, length|
-            case check 
-            when :soft
-              if soft_credit == 0
-                soft_offense(processed_source, index, length)
-              else
-                soft_credit -= 1
-              end
-            when :hard
-              hard_offense(processed_source, index, length)
-            end
+            soft_credit = report(soft_credit, check, index, length)
           end
         end
 
@@ -39,19 +30,31 @@ module RuboCop
 
         def check_line(line, index)
           case line.length
-          when 0                        then nil
-          when ->(l) { l <= soft_limit} then [:ok, nil, nil]
-          when ->(l) { l <= hard_limit} then [:soft, index, line.length]
-          else                               [:hard, index, line.length]
+          when 0                         then nil
+          when ->(l) { l <= soft_limit } then [:ok, nil, nil]
+          when ->(l) { l <= hard_limit } then [:soft, index, line.length]
+          else                                [:hard, index, line.length]
           end
         end
 
+        def report(soft_credit, check, index, length)
+          case check
+          when :soft
+            soft_credit -= 1
+            soft_offense(processed_source, index, length) if soft_credit < 0
+          when :hard
+            hard_offense(processed_source, index, length)
+          end
+
+          soft_credit
+        end
+
         def soft_offense(processed_source, index, length)
-           offense(processed_source, SOFT_MSG, index, length, soft_limit)
+          offense(processed_source, SOFT_MSG, index, length, soft_limit)
         end
 
         def hard_offense(processed_source, index, length)
-           offense(processed_source, HARD_MSG, index, length, hard_limit)
+          offense(processed_source, HARD_MSG, index, length, hard_limit)
         end
 
         def offense(processed_source, template, index, length, limit)
@@ -61,15 +64,15 @@ module RuboCop
         end
 
         def soft_limit
-          cop_config["SoftLimit"]
+          cop_config['SoftLimit']
         end
 
         def hard_limit
-          cop_config["HardLimit"]
+          cop_config['HardLimit']
         end
 
         def soft_allowance_percent_of_lines
-          cop_config["SoftAllowancePercentOfLines"]
+          cop_config['AllowedLongLinePercentage']
         end
       end
     end

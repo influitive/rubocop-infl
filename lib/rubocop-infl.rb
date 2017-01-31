@@ -1,12 +1,14 @@
-require "pathname"
-require "yaml"
+# rubocop:disable Style/FileName
 
-require "rubocop"
+require 'pathname'
+require 'yaml'
 
-require "rubocop/infl"
-require "rubocop/infl/version"
-require "rubocop/infl/inject"
+require 'rubocop'
+
+require 'rubocop/infl'
+require 'rubocop/infl/version'
+require 'rubocop/infl/inject'
 
 RuboCop::Infl::Inject.defaults!
 
-require "rubocop/cop/infl/soft_line_length"
+require 'rubocop/cop/infl/soft_line_length'

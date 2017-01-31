@@ -4,4 +4,4 @@ Infl/SoftLineLength:
   Enabled: true
   SoftLimit: 80
   HardLimit: 120
-  SoftAllowancePercentOfLines: 5
+  AllowedLongLinePercentage: 5
