@@ -29,10 +29,17 @@ limit.
       SoftLimit: 80
       HardLimit: 120
       AllowedLongLinePercentage: 2
+      IgnoreCopDirectives: true
 
 This would complain about *any* lines which were longer than 120 characters,
 and allow up to 2% of lines in a file to be longer than 80 characters
 before starting to complain about the lines longer that 80 characters.
+
+The `IgnoreCopDirectives` allows us to ignore `# rubocop:enable ...` (or
+`disable`) lines in the count so that we avoid the situation where adding a `#
+rubocop:disable Infl/SoftLineLength` to a file to stop a warning increases the
+line count so you then start getting an `Unnecessary disabling ...` message. The
+name for this option matches the option in recent `Metrics/LineLength` versions.
 
 # Inspiration
 
