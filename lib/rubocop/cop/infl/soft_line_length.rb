@@ -6,6 +6,12 @@ module RuboCop
         HARD_MSG = 'Line exceeds hard length limit. [%d/%d]'.freeze
         SOFT_MSG = 'Line exceeds soft length limit. [%d/%d]'.freeze
 
+        # Naive way of checking if lines are rubocop directives is to compare
+        # them against this regex. It's possible that they might be in a string
+        # which extends across many lines, we can address that when it becomes
+        # a problem!
+        DIRECTIVE_REGEX = /^\s*#\s*rubocop:(?:en|dis)able\s+\S/
+
         include RuboCop::Cop::ConfigurableEnforcedStyle
 
         def investigate(processed_source)
@@ -23,6 +29,7 @@ module RuboCop
         def calculate_stats(processed_source)
           processed_source
             .lines
+            .select { |line| keep?(line) }
             .each_with_index
             .map { |line, index| check_line(line, index) }
             .compact
@@ -35,6 +42,12 @@ module RuboCop
           when ->(l) { l <= hard_limit } then [:soft, index, line.length]
           else                                [:hard, index, line.length]
           end
+        end
+
+        def keep?(line)
+          return true unless ignore_cop_directives?
+
+          DIRECTIVE_REGEX !~ line
         end
 
         def report(soft_credit, check, index, length)
@@ -73,6 +86,10 @@ module RuboCop
 
         def soft_allowance_percent_of_lines
           cop_config['AllowedLongLinePercentage']
+        end
+
+        def ignore_cop_directives?
+          cop_config['IgnoreCopDirectives']
         end
       end
     end

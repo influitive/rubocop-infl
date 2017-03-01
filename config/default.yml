@@ -5,3 +5,4 @@ Infl/SoftLineLength:
   SoftLimit: 80
   HardLimit: 120
   AllowedLongLinePercentage: 5
+  IgnoreCopDirectives: true
